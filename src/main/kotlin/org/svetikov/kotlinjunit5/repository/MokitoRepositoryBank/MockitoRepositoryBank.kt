@@ -25,14 +25,30 @@ class MockitoRepositoryBank : DataSource {
         return banks
     }
 
-    override fun getBankByAccountNumber(accountNumber:String): Bank {
+    override fun getBankByAccountNumber(accountNumber: String): Bank {
         return banks.firstOrNull { it.accountNumber == accountNumber }
             ?: throw NoSuchElementException("Could not find a bank with account number $accountNumber")
 
     }
 
     override fun addNewBank(bank: Bank): Bank {
-       banks.add(bank)
+        banks.add(bank)
         return bank
+    }
+
+    override fun updateBank(bank: Bank): Bank {
+        val currentBank = banks.firstOrNull { it.accountNumber == bank.accountNumber }
+            ?: throw NoSuchElementException("Could not find a bank with account number ${bank.accountNumber}")
+
+        banks.remove(currentBank)
+        banks.add(bank)
+        return bank
+    }
+
+    override fun deleteByAccountNumber(accountNumber: String):Unit {
+       val deleteBank = banks.firstOrNull{it.accountNumber == accountNumber}
+           ?: throw NoSuchElementException("Could not find a bank with account number $accountNumber")
+        banks.remove(deleteBank)
+
     }
 }

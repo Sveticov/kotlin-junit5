@@ -21,8 +21,8 @@ class BankController(private val service: BankService) {
         ResponseEntity(e.message, HttpStatus.NOT_FOUND)
 
     @ExceptionHandler(IllegalArgumentException::class)
-    fun handleArgumentException(e:IllegalArgumentException):ResponseEntity<String> =
-    ResponseEntity(e.message,HttpStatus.BAD_REQUEST)
+    fun handleArgumentException(e: IllegalArgumentException): ResponseEntity<String> =
+        ResponseEntity(e.message, HttpStatus.BAD_REQUEST)
 
     @GetMapping("/banks")
     fun getBanks(): Collection<Bank> = service.getBanks()
@@ -38,7 +38,15 @@ class BankController(private val service: BankService) {
     @PatchMapping()
     fun updateBank(@RequestBody bank: Bank) = service.updateBank(bank)
 
-// upload and download file
+    @DeleteMapping("/{accountNumber}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteByAccountNumber(@PathVariable accountNumber: String):Unit{
+        service.deleteByAccountNumber(accountNumber)
+    }
+
+
+
+    // upload and download file
     @PostMapping("/doc")
     fun addDocument(@RequestParam("document") document: MultipartFile): String {
         println(

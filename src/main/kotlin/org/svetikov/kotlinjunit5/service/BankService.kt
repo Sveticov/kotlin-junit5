@@ -38,7 +38,10 @@ class BankService(private val dataSource: DataSource) {
         }
     }
 
-    fun updateBank(bank: Bank) = bank //TODO
+    fun updateBank(bank: Bank) = dataSource.updateBank(bank) //TODO
+    fun deleteByAccountNumber(accountNumber: String): Unit {
+        dataSource.deleteByAccountNumber(accountNumber)
+    }
 
 
 }

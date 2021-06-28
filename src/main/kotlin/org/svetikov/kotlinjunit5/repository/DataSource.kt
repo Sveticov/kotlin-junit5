@@ -9,4 +9,6 @@ interface DataSource {
     fun retrieveBanks(): Collection<Bank>
     fun getBankByAccountNumber(accountNumber:String): Bank
     fun addNewBank(bank: Bank) :Bank
+    fun updateBank(bank: Bank):Bank
+    fun deleteByAccountNumber(accountNumber: String)
 }

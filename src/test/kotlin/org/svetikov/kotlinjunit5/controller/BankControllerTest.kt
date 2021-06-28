@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
+
 import org.springframework.test.web.servlet.*
 import org.svetikov.kotlinjunit5.model.Bank
 
@@ -27,11 +28,11 @@ internal class BankControllerTest @Autowired constructor(
     inner class PatchExistingBank {
         @Test
         fun `should update an existing bank`() {
-            val updateBank = Bank("1",9.5,7)
+            val updateBank = Bank("1", 9.5, 7)
 
-          val performPatchRequest =  mockMvc.patch(url_bank){
+            val performPatchRequest = mockMvc.patch(url_bank) {
                 contentType = MediaType.APPLICATION_JSON
-                content=objectMapper.writeValueAsString(updateBank)
+                content = objectMapper.writeValueAsString(updateBank)
             }
 
             performPatchRequest
@@ -41,6 +42,69 @@ internal class BankControllerTest @Autowired constructor(
                     content {
                         contentType(MediaType.APPLICATION_JSON)
                         json(objectMapper.writeValueAsString(updateBank))
+                    }
+                }
+
+            mockMvc.get("$url_bank/${updateBank.accountNumber}")
+                .andDo { print() }
+                .andExpect {
+                    content {
+                        json(objectMapper.writeValueAsString(updateBank))
+                    }
+                }
+        }
+
+        @Test
+        fun `should BAD REQUEST if bank not exist `() {
+            val invalidBank = Bank("does`t not exists", 0.1, 1)
+
+         val performPatchRequest =   mockMvc.patch(url_bank) {
+                contentType = MediaType.APPLICATION_JSON
+                content = objectMapper.writeValueAsString(invalidBank)
+            }
+
+            performPatchRequest
+                .andDo { print() }
+                .andExpect {
+                    content {
+                        status { isNotFound() }
+                    }
+                }
+        }
+    }
+
+    @Nested
+    @DisplayName("DELETE/api/bank/{accountNumber}")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class DeleteBank{
+        @DisplayName("DELETE/api/bank/{accountNumber}")
+        @Test
+        fun `should delete bank by accountNumber`(){
+            val deleteAccountNumber = "1"
+
+            mockMvc.delete("$url_bank/$deleteAccountNumber")
+                .andDo { print() }
+                .andExpect {
+                    status { isNoContent() }
+                }
+
+            mockMvc.get("$url_bank/$deleteAccountNumber")
+                .andDo { print() }
+                .andExpect {
+                    status {
+                        isNotFound()
+                    }
+                }
+        }
+        @Test
+        fun `should not exists accountNumber`(){
+            val not_exists_accountNumber = "not_exists"
+
+            mockMvc.delete("$url_bank/$not_exists_accountNumber")
+                .andDo { print() }
+                .andExpect {
+                    status {
+                        isNotFound()
                     }
                 }
         }
